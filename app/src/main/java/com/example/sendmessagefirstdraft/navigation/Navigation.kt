@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sendmessagefirstdraft.screens.AddMoreSmsContacts
 import com.example.sendmessagefirstdraft.screens.AddMoreWhatsappContact
 import com.example.sendmessagefirstdraft.screens.MainScreen
+import com.example.sendmessagefirstdraft.screens.MainScreenViewModel
 import com.example.sendmessagefirstdraft.screens.SmsScreen
 import com.example.sendmessagefirstdraft.screens.WhatsappScreen
 
@@ -21,6 +22,7 @@ enum class Screens {
 
 @Composable
 fun NavigationRules(
+    viewModel: MainScreenViewModel,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -31,7 +33,7 @@ fun NavigationRules(
     ) {
 
         composable(route = Screens.MainScreen.name , content = {
-            MainScreen(navController)
+            MainScreen(viewModel,navController)
         })
 
         composable(route = Screens.SmsScreen.name , content = {

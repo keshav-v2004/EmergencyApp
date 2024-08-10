@@ -27,17 +27,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.sendmessagefirstdraft.R
+import com.example.sendmessagefirstdraft.navigation.Screens
 
 @Composable
 fun WhatsappScreen(
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
 
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /*TODO*/ }
+                onClick = { navController.navigate(Screens.AddWhatsappContact.name) }
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
@@ -68,6 +71,7 @@ fun WhatsappScreen(
 
 @Composable
 fun AddMoreWhatsappContact(
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     var number by rememberSaveable {
@@ -127,6 +131,6 @@ fun AddMoreWhatsappContact(
 @Preview(showSystemUi = true)
 @Composable
 private fun PreviewFxn() {
-    WhatsappScreen()
+//    WhatsappScreen()
 
 }

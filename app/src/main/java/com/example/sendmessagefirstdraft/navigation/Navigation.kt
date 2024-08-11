@@ -10,7 +10,9 @@ import com.example.sendmessagefirstdraft.screens.AddMoreWhatsappContact
 import com.example.sendmessagefirstdraft.screens.MainScreen
 import com.example.sendmessagefirstdraft.screens.MainScreenViewModel
 import com.example.sendmessagefirstdraft.screens.SmsScreen
+import com.example.sendmessagefirstdraft.screens.SmsScreenViewModel
 import com.example.sendmessagefirstdraft.screens.WhatsappScreen
+import com.example.sendmessagefirstdraft.screens.WhatsappScreenViewModel
 
 enum class Screens {
     MainScreen,
@@ -23,6 +25,8 @@ enum class Screens {
 @Composable
 fun NavigationRules(
     viewModel: MainScreenViewModel,
+    smsScreenViewModel: SmsScreenViewModel,
+    whatsappScreenViewModel: WhatsappScreenViewModel,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -37,19 +41,19 @@ fun NavigationRules(
         })
 
         composable(route = Screens.SmsScreen.name , content = {
-            SmsScreen(navController)
+            SmsScreen( smsScreenViewModel , navController)
         })
 
         composable(route = Screens.AddSmsContact.name , content = {
-            AddMoreSmsContacts(navController)
+            AddMoreSmsContacts(smsScreenViewModel,navController)
         })
 
         composable(route = Screens.WhatsappScreen.name , content = {
-            WhatsappScreen(navController)
+            WhatsappScreen(navController , whatsappScreenViewModel)
         })
 
         composable(route = Screens.AddWhatsappContact.name , content = {
-            AddMoreWhatsappContact(navController)
+            AddMoreWhatsappContact(navController , whatsappScreenViewModel)
         })
     }
 }

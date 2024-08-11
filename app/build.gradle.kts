@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
 
-
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -74,12 +74,20 @@ dependencies {
     //Navigation
     implementation(libs.androidx.navigation.compose)
 
-    //Room
-    implementation(libs.androidx.room.runtime)
-    annotationProcessor(libs.androidx.room.compiler)
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
 
-    //LiveData
-    implementation(libs.androidx.runtime.livedata)
+
+    val room_version = "2.6.1"
+
+
+    // To use Kotlin Symbol Processing (KSP)
+    ksp("androidx.room:room-compiler:$room_version")
+
+    implementation("androidx.room:room-runtime:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+
+
+
 
 
 }

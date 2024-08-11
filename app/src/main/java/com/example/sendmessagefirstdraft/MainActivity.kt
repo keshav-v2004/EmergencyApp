@@ -14,6 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
 import com.example.sendmessagefirstdraft.navigation.NavigationRules
 import com.example.sendmessagefirstdraft.screens.MainScreenViewModel
+import com.example.sendmessagefirstdraft.screens.SmsScreenViewModel
+import com.example.sendmessagefirstdraft.screens.WhatsappScreenViewModel
 import com.example.sendmessagefirstdraft.ui.theme.SendMessageFirstDraftTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,10 +23,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val viewModel = ViewModelProvider(this)[MainScreenViewModel::class.java]
+
+        val smsScreenViewModel = ViewModelProvider(this)[SmsScreenViewModel::class.java]
+
+        val whatsappScreenViewModel = ViewModelProvider(this)[WhatsappScreenViewModel::class.java]
+
         enableEdgeToEdge()
         setContent {
             SendMessageFirstDraftTheme {
-                NavigationRules(viewModel)
+                NavigationRules(viewModel , smsScreenViewModel , whatsappScreenViewModel)
             }
         }
     }

@@ -2,6 +2,8 @@ package com.example.sendmessagefirstdraft.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,9 +16,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -27,8 +32,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -71,13 +80,13 @@ fun Logos(
     snackbarHostState: SnackbarHostState,
 ) {
 
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
+            .background(Color.White)
 
     ) {
 
@@ -85,6 +94,7 @@ fun Logos(
             painter = painterResource(id = R.drawable._6zvtnln3toz309wttldiwp_25),
             contentDescription = null,
             modifier = Modifier
+                .clip(RoundedCornerShape(50.dp))
                 .combinedClickable(
                     onClick = { navController.navigate(Screens.WhatsappScreen.name) },
                     onLongClick = {
@@ -102,6 +112,7 @@ fun Logos(
         ),
             contentDescription = null,
             modifier = Modifier
+                .clip(RoundedCornerShape(50.dp))
                 .combinedClickable(
                     onClick = { navController.navigate(Screens.SmsScreen.name) },
                     onLongClick = {
@@ -184,23 +195,41 @@ fun BelowLogos(
 
     ) {
         Card(
+            colors = CardColors(
+                containerColor = Color.Blue,
+                contentColor = Color.White,
+                disabledContentColor = Color.Unspecified,
+                disabledContainerColor = Color.Unspecified
+            ),
             modifier = Modifier
+                .clip(RoundedCornerShape(50.dp))
+                .border(2.dp , Color.Black , CircleShape)
                 .weight(1f)
                 .clickable { }
         ) {
             Box {
                 Text(
-                    text = "Medical information",
+                    text = "Medical Information",
                     fontSize = 32.sp,
-                    textAlign = TextAlign.Center
+                    lineHeight = 32.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
 
         Spacer(modifier = Modifier.width(10.dp))
 
-        Card (
+        Card(
+            colors = CardColors(
+                containerColor = Color.Yellow,
+                contentColor = Color.Red,
+                disabledContentColor = Color.Unspecified,
+                disabledContainerColor = Color.Unspecified
+            ),
             modifier = Modifier
+                .clip(RoundedCornerShape(50.dp))
+                .border(2.dp , Color.Black , CircleShape)
                 .weight(1f)
                 .clickable { }
         ){
@@ -208,7 +237,10 @@ fun BelowLogos(
                 Text(
                     text = "Call Emergency",
                     fontSize = 32.sp,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 32.sp,
+
                 )
             }
         }

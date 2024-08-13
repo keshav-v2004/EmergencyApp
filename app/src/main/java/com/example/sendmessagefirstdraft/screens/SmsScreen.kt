@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -25,6 +27,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,11 +38,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.font.FontWeight.Companion.Medium
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sendmessagefirstdraft.R
 import com.example.sendmessagefirstdraft.db.SmsList
@@ -73,18 +83,43 @@ fun SmsScreen(
                 .background(Color(0xffed4545))
         ) {
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
             Image(
                 painter = painterResource(id = R.drawable.white_exclamation_mark_sign_red_circle_isolated_white_background_120819_332), 
-                contentDescription = null)
-            
-            Text(text = "please be careful while using this")
+                contentDescription = null,
+                modifier = modifier.clip(RoundedCornerShape(50.dp))
 
-            Text(text = "(up to 6 contacts only)")
-            
-            Text(text = "all saved contacts will be shown here")
+            )
 
+            Spacer(modifier = Modifier.height(25.dp))
+
+            Text(
+                text = "please be careful while using this",
+                color = Color.White,
+                fontSize = 25.sp,
+                lineHeight = 25.sp,
+                fontWeight = Bold
+            )
+
+            Text(
+                text = "(up to 6 contacts only)",
+                color = Color.White,
+                fontSize = 25.sp,
+                lineHeight = 25.sp,
+                fontWeight = Bold
+            )
+            
+            Text(
+                text = "all saved contacts will be shown here",
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                fontSize = 25.sp,
+                lineHeight = 25.sp,
+                fontWeight = Bold
+            )
+
+            Spacer(modifier = Modifier.height(25.dp))
             allSmsContacts?.let {
                 if (allSmsContacts!!.isNotEmpty()){
                     LazyColumn(
@@ -96,7 +131,12 @@ fun SmsScreen(
                         }
                     }
                 }else{
-                    Text(text = "No contacts added")
+                    Text(
+                        text = "No contacts added",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 36.sp
+                    )
                 }
             }
             
@@ -177,31 +217,102 @@ fun AddMoreSmsContacts(
         Spacer(modifier = Modifier.height(32.dp))
         Image(
             painter = painterResource(id = R.drawable.white_exclamation_mark_sign_red_circle_isolated_white_background_120819_332),
-            contentDescription = null
+            contentDescription = null,
+            modifier = modifier
+                .clip(RoundedCornerShape(50.dp))
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         OutlinedTextField(
+            modifier = modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
+            leadingIcon = {
+                Icon(imageVector = Icons.Default.Call,
+                    contentDescription = null ,
+                    tint = Color.White
+                ) },
             value = number,
             onValueChange = {number = it},
-            placeholder = { Text(text = "enter receiver NUMBER")}
+            placeholder = {
+                Text(
+                    text = "enter receiver NUMBER",
+                    color = Color.White,
+                    fontWeight = Medium,
+                    fontSize = 20.sp,
+                )},
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.White,
+                focusedBorderColor = Color.White,
+                disabledBorderColor = Color.White,
+                disabledTextColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            ),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
+            leadingIcon = {
+                Icon(painter = painterResource(id = R.drawable.baseline_person_add_24),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            },
+            modifier = modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
             value = name,
             onValueChange = {name = it},
-            placeholder = { Text(text = "enter receiver NAME")}
+            placeholder = { Text(
+                text = "enter receiver NAME",
+                color = Color.White,
+                fontWeight = Medium,
+                fontSize = 20.sp,
+            )},
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.White,
+                focusedBorderColor = Color.White,
+                disabledBorderColor = Color.White,
+                disabledTextColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            ),
         )
 
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_message_24),
+                    contentDescription = null ,
+                    tint = Color.White
+                )
+            },
+            modifier = modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
             value = message,
             onValueChange = {message = it},
-            placeholder = { Text(text = "enter message")}
+            placeholder = {
+                Text(
+                    text = "enter message",
+                    color = Color.White,
+                    fontWeight = Medium,
+                    fontSize = 20.sp
+                )
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.White,
+                focusedBorderColor = Color.White,
+                disabledBorderColor = Color.White,
+                disabledTextColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            ),
         )
 
-
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
@@ -214,7 +325,11 @@ fun AddMoreSmsContacts(
                 }
             }
         ) {
-            Text(text = "save contact")
+            Text(
+                text = "save contact",
+                fontSize = 25.sp
+
+            )
         }
 
     }

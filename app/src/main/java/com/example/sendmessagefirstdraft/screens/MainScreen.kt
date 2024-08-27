@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
@@ -83,6 +84,33 @@ fun MainScreen(
         ) {
             Logos(viewModel, navController, snackbarHost , smsManager , allSmsContacts , allwhatsappContacts)
             BelowLogos()
+
+            Spacer(modifier = Modifier.height(35.dp))
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ){
+                Column {
+                    Text(
+                        text = "Keep calm",
+                        fontSize = 35.sp,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 35.sp,
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Don't panic",
+                        fontSize = 35.sp,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 35.sp,
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+            }
         }
     }
 }

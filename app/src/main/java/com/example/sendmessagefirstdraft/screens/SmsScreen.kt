@@ -3,6 +3,7 @@ package com.example.sendmessagefirstdraft.screens
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,11 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -53,7 +55,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sendmessagefirstdraft.R
 import com.example.sendmessagefirstdraft.db.SmsList
-import com.example.sendmessagefirstdraft.db.WhatsappList
 import com.example.sendmessagefirstdraft.navigation.Screens
 
 @Composable
@@ -101,14 +102,7 @@ fun SmsScreen(
                 lineHeight = 25.sp,
                 fontWeight = Bold
             )
-
-            Text(
-                text = "(up to 6 contacts only)",
-                color = Color.White,
-                fontSize = 25.sp,
-                lineHeight = 25.sp,
-                fontWeight = Bold
-            )
+            
             
             Text(
                 text = "all saved contacts will be shown here",
@@ -128,6 +122,7 @@ fun SmsScreen(
                     ) {
                         items(allSmsContacts!!) { each->
                             EachSmsContactCard(smsList = each , deleteSmsContact = {viewModel.deleteFromSms(each.id)})
+                            Spacer(modifier = Modifier.height(15.dp))
                         }
                     }
                 }else{
@@ -152,35 +147,66 @@ fun EachSmsContactCard(
     modifier: Modifier = Modifier
 ) {
     
-    Card {
+    Card(
+        colors = CardColors(
+            containerColor = Color.Transparent,
+            contentColor = Color.White,
+            disabledContentColor = Color.Unspecified,
+            disabledContainerColor = Color.Unspecified
+        ),
+        modifier = modifier
+            .clip(RoundedCornerShape(25.dp))
+            .border(2.dp, Color.White, CircleShape)
+    ) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
+                .padding(10.dp)
 
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically,
-
+                modifier = modifier
+                    .fillMaxWidth()
             ){
-                Text(text = smsList.number)
+                Text(
+                    text = smsList.number,
+                    fontWeight = Bold,
+                    fontSize = 25.sp,
+                )
 
                 Spacer(modifier = Modifier.width(32.dp))
 
-                Text(text = smsList.name)
+                Text(
+                    text = smsList.name,
+                    fontWeight = Bold,
+                    fontSize = 25.sp,
+                )
 
-                Spacer(modifier = Modifier.width(32.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
                 IconButton(
                     onClick = deleteSmsContact
                 ) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                    Icon(
+                        imageVector = Icons.Default.Delete, 
+                        contentDescription = null,
+                        modifier = modifier
+                            .size(40.dp)
+                            .border(2.dp, Color.White, CircleShape)
+                    )
                 }
-
+                
             }
-            Text(text = smsList.message)
+            Text(
+                text = smsList.message,
+                fontWeight = Bold,
+                fontSize = 25.sp,
+            )
         }
+        
     }
     
 }

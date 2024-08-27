@@ -1,5 +1,10 @@
 package com.example.sendmessagefirstdraft.screens
 
+import android.content.Intent
+import android.net.Uri
+import android.telephony.SmsManager
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,13 +33,14 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,15 +50,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sendmessagefirstdraft.R
+import com.example.sendmessagefirstdraft.db.SmsList
+import com.example.sendmessagefirstdraft.db.WhatsappList
 import com.example.sendmessagefirstdraft.navigation.Screens
 import kotlinx.coroutines.launch
+import java.lang.String
 
 @Composable
 fun MainScreen(
     viewModel: MainScreenViewModel,
     navController: NavController,
+    smsManager: SmsManager,
+    smsScreenViewModel: SmsScreenViewModel,
+    whatsappScreenViewModel: WhatsappScreenViewModel,
 
-) {
+    ) {
+
+    val allSmsContacts by smsScreenViewModel.getSmsContacts().observeAsState()
+    val allwhatsappContacts by whatsappScreenViewModel.getAllWhatsappContacts().observeAsState()
 
     val snackbarHost = remember{ SnackbarHostState() }
 
@@ -66,7 +81,7 @@ fun MainScreen(
                 .statusBarsPadding()
                 .fillMaxSize()
         ) {
-            Logos(viewModel, navController, snackbarHost)
+            Logos(viewModel, navController, snackbarHost , smsManager , allSmsContacts , allwhatsappContacts)
             BelowLogos()
         }
     }
@@ -78,6 +93,9 @@ fun Logos(
     viewModel: MainScreenViewModel,
     navController: NavController,
     snackbarHostState: SnackbarHostState,
+    smsManager: SmsManager,
+    allSmsContacts: List<SmsList>?,
+    allwhatsappContacts: List<WhatsappList>?,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -124,6 +142,7 @@ fun Logos(
     }
 
 
+    val context = LocalContext.current
 
     if (viewModel.showSmsDialog) {
         AlertDialog(
@@ -131,9 +150,25 @@ fun Logos(
             confirmButton = {
                 Button(
                     onClick = {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("sending")
+                        try {
+                            scope.launch {
+                                if(!allSmsContacts.isNullOrEmpty()) {
+                                    allSmsContacts.forEach { eachContact ->
+                                        smsManager.sendTextMessage(eachContact.number , null , eachContact.message , null , null)
+                                    }
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Sent message to ${allSmsContacts.size} contacts")
+                                    }
+
+                                }
+                                else{
+                                    Toast.makeText( context, "NO contcats added" , Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.i("smsSendingError" , e.message.toString())
                         }
+                        viewModel.updateDialogState(viewModel.showSmsDialog , Screens.SmsScreen.name)
                     }
                 ) {
                     Text("confirm")
@@ -157,9 +192,38 @@ fun Logos(
             confirmButton = {
                 Button(
                     onClick = {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("sending")
+
+                        try {
+                            if (!allwhatsappContacts.isNullOrEmpty()) {
+                                allwhatsappContacts.forEach { eachWhatsappContact->
+                                    scope.launch {
+                                        context.startActivity(
+                                            Intent(
+                                                Intent
+                                                    .ACTION_VIEW,
+                                                Uri.parse(
+                                                    String.format(
+                                                        "https://api.whatsapp.com/send?phone=%s&text=%s",
+                                                        eachWhatsappContact.number,
+                                                        eachWhatsappContact.message
+                                                    )
+                                                )
+                                            )
+                                        )
+                                        return@launch
+                                    }
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("sending")
+                                    }
+                                }
+                            }else {
+                                Toast.makeText( context, "NO contacts added" , Toast.LENGTH_LONG).show()
+                            }
+                        } catch (e: Exception) {
+                            Log.i("whatsappSendError" , e.message.toString())
                         }
+
+                        viewModel.updateDialogState(viewModel.showWhatsappDialog , Screens.WhatsappScreen.name)
                     }
                         
                 ) {
@@ -183,10 +247,12 @@ fun Logos(
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BelowLogos(
     modifier: Modifier = Modifier
 ) {
+    val ctx = LocalContext.current
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
@@ -203,7 +269,7 @@ fun BelowLogos(
             ),
             modifier = Modifier
                 .clip(RoundedCornerShape(50.dp))
-                .border(2.dp , Color.Black , CircleShape)
+                .border(2.dp, Color.Black, CircleShape)
                 .weight(1f)
                 .clickable { }
         ) {
@@ -229,11 +295,30 @@ fun BelowLogos(
             ),
             modifier = Modifier
                 .clip(RoundedCornerShape(50.dp))
-                .border(2.dp , Color.Black , CircleShape)
+                .border(2.dp, Color.Black, CircleShape)
                 .weight(1f)
                 .clickable { }
         ){
-            Box {
+            Box(
+                modifier = modifier
+                    .combinedClickable(
+                        enabled = true,
+                        onClick = {},
+                        onLongClick = {
+
+                            val u = Uri.parse("tel:" + "+919315225533")
+
+                            val i = Intent(Intent.ACTION_DIAL , u)
+
+                            try {
+                                ctx.startActivity(i)
+                            }catch (e: SecurityException) {
+                                Toast.makeText(ctx, "An error occurred", Toast.LENGTH_LONG)
+                                    .show()
+                            }
+                        }
+                    )
+            ) {
                 Text(
                     text = "Call Emergency",
                     fontSize = 32.sp,

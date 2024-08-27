@@ -1,5 +1,6 @@
 package com.example.sendmessagefirstdraft.navigation
 
+import android.telephony.SmsManager
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -27,6 +28,7 @@ fun NavigationRules(
     viewModel: MainScreenViewModel,
     smsScreenViewModel: SmsScreenViewModel,
     whatsappScreenViewModel: WhatsappScreenViewModel,
+    smsManager: SmsManager,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -37,7 +39,7 @@ fun NavigationRules(
     ) {
 
         composable(route = Screens.MainScreen.name , content = {
-            MainScreen(viewModel,navController)
+            MainScreen(viewModel,navController , smsManager , smsScreenViewModel , whatsappScreenViewModel)
         })
 
         composable(route = Screens.SmsScreen.name , content = {

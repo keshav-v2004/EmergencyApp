@@ -107,12 +107,17 @@ fun WhatsappScreen(
 
             allWhatsappContacts?.let {
                 if (allWhatsappContacts!!.isNotEmpty()){
-                    LazyColumn {
+                    LazyColumn(
+                        modifier = modifier
+                            .padding(2.dp)
+                    ) {
                         items(allWhatsappContacts!!) {each->
                             EachWhatsappContactCard(
                                 deleteFromWhatsappContact = { viewModel.deleteFromWhatsapp(each.id) },
                                 whatsappList = each
                             )
+                            Spacer(modifier = Modifier.height(15.dp))
+
                         }
                     }
                 }
@@ -159,7 +164,8 @@ fun EachWhatsappContactCard(
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
-
+                modifier = modifier
+                    .fillMaxWidth()
                 ){
                 Text(
                     text = whatsappList.number,

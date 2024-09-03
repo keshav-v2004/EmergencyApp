@@ -1,6 +1,8 @@
 package com.example.sendmessagefirstdraft.screens
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.location.Location
 import android.net.Uri
 import android.telephony.SmsManager
 import android.util.Log
@@ -36,8 +38,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +58,7 @@ import com.example.sendmessagefirstdraft.R
 import com.example.sendmessagefirstdraft.db.SmsList
 import com.example.sendmessagefirstdraft.db.WhatsappList
 import com.example.sendmessagefirstdraft.navigation.Screens
+import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.launch
 import java.lang.String
 
@@ -64,13 +69,13 @@ fun MainScreen(
     smsManager: SmsManager,
     smsScreenViewModel: SmsScreenViewModel,
     whatsappScreenViewModel: WhatsappScreenViewModel,
-
-    ) {
+    fusedLocationClient: FusedLocationProviderClient,
+) {
 
     val allSmsContacts by smsScreenViewModel.getSmsContacts().observeAsState()
     val allwhatsappContacts by whatsappScreenViewModel.getAllWhatsappContacts().observeAsState()
 
-    val snackbarHost = remember{ SnackbarHostState() }
+    val snackbarHost = remember { SnackbarHostState() }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHost) }
@@ -82,7 +87,14 @@ fun MainScreen(
                 .statusBarsPadding()
                 .fillMaxSize()
         ) {
-            Logos(viewModel, navController, snackbarHost , smsManager , allSmsContacts , allwhatsappContacts)
+            Logos(
+                viewModel,
+                navController,
+                snackbarHost,
+                smsManager, allSmsContacts,
+                allwhatsappContacts,
+                fusedLocationClient
+            )
             BelowLogos()
 
             Spacer(modifier = Modifier.height(35.dp))
@@ -90,7 +102,7 @@ fun MainScreen(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-            ){
+            ) {
                 Column {
                     Text(
                         text = "Keep calm",
@@ -101,7 +113,7 @@ fun MainScreen(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Don't panic",
+                        text = "Don't panic !",
                         fontSize = 35.sp,
                         textAlign = TextAlign.Center,
                         lineHeight = 35.sp,
@@ -115,6 +127,7 @@ fun MainScreen(
     }
 }
 
+@SuppressLint("MissingPermission")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Logos(
@@ -124,9 +137,18 @@ fun Logos(
     smsManager: SmsManager,
     allSmsContacts: List<SmsList>?,
     allwhatsappContacts: List<WhatsappList>?,
+    fusedLocationClient: FusedLocationProviderClient,
 ) {
 
     val scope = rememberCoroutineScope()
+
+    var lati by remember {
+        mutableStateOf("")
+    }
+
+    var longi by remember {
+        mutableStateOf("")
+    }
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -172,31 +194,70 @@ fun Logos(
 
     val context = LocalContext.current
 
+
     if (viewModel.showSmsDialog) {
         AlertDialog(
-            onDismissRequest = { viewModel.updateDialogState(viewModel.showSmsDialog , Screens.SmsScreen.name) },
+            onDismissRequest = {
+                viewModel.updateDialogState(
+                    viewModel.showSmsDialog,
+                    Screens.SmsScreen.name
+                )
+            },
             confirmButton = {
                 Button(
                     onClick = {
                         try {
                             scope.launch {
-                                if(!allSmsContacts.isNullOrEmpty()) {
+
+                                if (!allSmsContacts.isNullOrEmpty()) {
                                     allSmsContacts.forEach { eachContact ->
-                                        smsManager.sendTextMessage(eachContact.number , null , eachContact.message , null , null)
+
+                                        try {
+                                            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                                                if (location != null) {
+
+                                                    lati = location.latitude.toString()
+                                                    longi = location.longitude.toString()
+
+                                                    smsManager.sendTextMessage(
+                                                        eachContact.number,
+                                                        null,
+                                                        eachContact.message + "\nmy coordinates are latitude : $lati , longitude : $longi",
+                                                        null, null
+                                                    )
+                                                }
+                                                else {
+                                                    smsManager.sendTextMessage(
+                                                        eachContact.number,
+                                                        null,
+                                                        eachContact.message,
+                                                        null, null
+                                                    )
+                                                }
+                                            }
+                                        } catch (e: Error) {
+                                            Toast.makeText(
+                                                context,
+                                                e.message.toString(),
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+
                                     }
                                     scope.launch {
                                         snackbarHostState.showSnackbar("Sent message to ${allSmsContacts.size} contacts")
                                     }
 
-                                }
-                                else{
-                                    Toast.makeText( context, "NO contcats added" , Toast.LENGTH_LONG).show()
+
+                                } else {
+                                    Toast.makeText(context, "NO contacts added", Toast.LENGTH_LONG)
+                                        .show()
                                 }
                             }
                         } catch (e: Exception) {
-                            Log.i("smsSendingError" , e.message.toString())
+                            Log.i("smsSendingError", e.message.toString())
                         }
-                        viewModel.updateDialogState(viewModel.showSmsDialog , Screens.SmsScreen.name)
+                        viewModel.updateDialogState(viewModel.showSmsDialog, Screens.SmsScreen.name)
                     }
                 ) {
                     Text("confirm")
@@ -204,27 +265,37 @@ fun Logos(
             },
             dismissButton = {
                 OutlinedButton(
-                    onClick = { viewModel.updateDialogState(viewModel.showSmsDialog , Screens.SmsScreen.name) }
+                    onClick = {
+                        viewModel.updateDialogState(
+                            viewModel.showSmsDialog,
+                            Screens.SmsScreen.name
+                        )
+                    }
                 ) {
                     Text(text = "Abort")
                 }
             },
             title = { Text(text = "Warning!") },
-            text = { Text(text = "you are about to perform a critical task.Please confirm to proceed")}
+            text = { Text(text = "you are about to perform a critical task.Please confirm to proceed") }
         )
-    }
-
-    else if (viewModel.showWhatsappDialog) {
+    } else if (viewModel.showWhatsappDialog) {
         AlertDialog(
-            onDismissRequest = { viewModel.updateDialogState(viewModel.showWhatsappDialog , Screens.WhatsappScreen.name) },
+            onDismissRequest = {
+                viewModel.updateDialogState(
+                    viewModel.showWhatsappDialog,
+                    Screens.WhatsappScreen.name
+                )
+            },
             confirmButton = {
                 Button(
                     onClick = {
 
                         try {
                             if (!allwhatsappContacts.isNullOrEmpty()) {
-                                allwhatsappContacts.forEach { eachWhatsappContact->
+                                allwhatsappContacts.forEach { eachWhatsappContact ->
+
                                     scope.launch {
+
                                         context.startActivity(
                                             Intent(
                                                 Intent
@@ -240,37 +311,46 @@ fun Logos(
                                         )
                                         return@launch
                                     }
+
+
                                     scope.launch {
                                         snackbarHostState.showSnackbar("sending")
                                     }
                                 }
-                            }else {
-                                Toast.makeText( context, "NO contacts added" , Toast.LENGTH_LONG).show()
+                            } else {
+                                Toast.makeText(context, "NO contacts added", Toast.LENGTH_LONG)
+                                    .show()
                             }
                         } catch (e: Exception) {
-                            Log.i("whatsappSendError" , e.message.toString())
+                            Log.i("whatsappSendError", e.message.toString())
                         }
 
-                        viewModel.updateDialogState(viewModel.showWhatsappDialog , Screens.WhatsappScreen.name)
+                        viewModel.updateDialogState(
+                            viewModel.showWhatsappDialog,
+                            Screens.WhatsappScreen.name
+                        )
                     }
-                        
+
                 ) {
                     Text("confirm")
                 }
             },
             dismissButton = {
                 OutlinedButton(
-                    onClick = { viewModel.updateDialogState(viewModel.showWhatsappDialog , Screens.WhatsappScreen.name) }
+                    onClick = {
+                        viewModel.updateDialogState(
+                            viewModel.showWhatsappDialog,
+                            Screens.WhatsappScreen.name
+                        )
+                    }
                 ) {
                     Text(text = "Abort")
                 }
             },
             title = { Text(text = "Warning!") },
-            text = { Text(text = "you are about to perform a critical task.Please confirm to proceed")}
+            text = { Text(text = "you are about to perform a critical task.Please confirm to proceed") }
         )
     }
-
-
 
 
 }
@@ -290,8 +370,8 @@ fun BelowLogos(
     ) {
         Card(
             colors = CardColors(
-                containerColor = Color.Blue,
-                contentColor = Color.White,
+                containerColor = Color(0xff90e0ef),
+                contentColor = Color(0xff03045e),
                 disabledContentColor = Color.Unspecified,
                 disabledContainerColor = Color.Unspecified
             ),
@@ -316,8 +396,8 @@ fun BelowLogos(
 
         Card(
             colors = CardColors(
-                containerColor = Color.Yellow,
-                contentColor = Color.Red,
+                containerColor = Color(0xffffd500),
+                contentColor = Color(0xffd90429),
                 disabledContentColor = Color.Unspecified,
                 disabledContainerColor = Color.Unspecified
             ),
@@ -326,7 +406,7 @@ fun BelowLogos(
                 .border(2.dp, Color.Black, CircleShape)
                 .weight(1f)
                 .clickable { }
-        ){
+        ) {
             Box(
                 modifier = modifier
                     .combinedClickable(
@@ -336,11 +416,11 @@ fun BelowLogos(
 
                             val u = Uri.parse("tel:" + "+919315225533")
 
-                            val i = Intent(Intent.ACTION_DIAL , u)
+                            val i = Intent(Intent.ACTION_DIAL, u)
 
                             try {
                                 ctx.startActivity(i)
-                            }catch (e: SecurityException) {
+                            } catch (e: SecurityException) {
                                 Toast.makeText(ctx, "An error occurred", Toast.LENGTH_LONG)
                                     .show()
                             }
@@ -354,7 +434,7 @@ fun BelowLogos(
                     fontWeight = FontWeight.Bold,
                     lineHeight = 32.sp,
 
-                )
+                    )
             }
         }
     }

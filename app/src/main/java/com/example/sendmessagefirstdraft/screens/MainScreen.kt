@@ -289,12 +289,14 @@ fun Logos(
             confirmButton = {
                 Button(
                     onClick = {
-
                         try {
                             if (!allwhatsappContacts.isNullOrEmpty()) {
-                                allwhatsappContacts.forEach { eachWhatsappContact ->
 
-                                    scope.launch {
+                                fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                                    if (location != null) {
+
+                                        lati = location.latitude.toString()
+                                        longi = location.longitude.toString()
 
                                         context.startActivity(
                                             Intent(
@@ -303,27 +305,34 @@ fun Logos(
                                                 Uri.parse(
                                                     String.format(
                                                         "https://api.whatsapp.com/send?phone=%s&text=%s",
-                                                        eachWhatsappContact.number,
-                                                        eachWhatsappContact.message
+                                                        allwhatsappContacts[0].number,
+                                                        allwhatsappContacts[0].message+"\nmy coordinates are\n latitude : $lati\n longitude : $longi"
                                                     )
                                                 )
                                             )
                                         )
-                                        return@launch
+                                        Toast.makeText(context , "sending with coordinates" , Toast.LENGTH_LONG).show()
                                     }
-
-
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar("sending")
+                                    else {
+                                        context.startActivity(
+                                            Intent(
+                                                Intent
+                                                    .ACTION_VIEW,
+                                                Uri.parse(
+                                                    String.format(
+                                                        "https://api.whatsapp.com/send?phone=%s&text=%s",
+                                                        allwhatsappContacts[0].number,
+                                                        allwhatsappContacts[0].message
+                                                    )
+                                                )
+                                            )
+                                        )
+                                        Toast.makeText(context , "sending without location coordinates" , Toast.LENGTH_LONG).show()
                                     }
                                 }
-                            } else {
-                                Toast.makeText(context, "NO contacts added", Toast.LENGTH_LONG)
-                                    .show()
-                            }
-                        } catch (e: Exception) {
-                            Log.i("whatsappSendError", e.message.toString())
+
                         }
+                        }catch (_:Error){}
 
                         viewModel.updateDialogState(
                             viewModel.showWhatsappDialog,

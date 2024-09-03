@@ -14,6 +14,7 @@ import com.example.sendmessagefirstdraft.screens.SmsScreen
 import com.example.sendmessagefirstdraft.screens.SmsScreenViewModel
 import com.example.sendmessagefirstdraft.screens.WhatsappScreen
 import com.example.sendmessagefirstdraft.screens.WhatsappScreenViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
 
 enum class Screens {
     MainScreen,
@@ -29,6 +30,7 @@ fun NavigationRules(
     smsScreenViewModel: SmsScreenViewModel,
     whatsappScreenViewModel: WhatsappScreenViewModel,
     smsManager: SmsManager,
+    fusedLocationClient : FusedLocationProviderClient,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -39,7 +41,8 @@ fun NavigationRules(
     ) {
 
         composable(route = Screens.MainScreen.name , content = {
-            MainScreen(viewModel,navController , smsManager , smsScreenViewModel , whatsappScreenViewModel)
+            MainScreen(
+                viewModel,navController , smsManager , smsScreenViewModel , whatsappScreenViewModel , fusedLocationClient)
         })
 
         composable(route = Screens.SmsScreen.name , content = {

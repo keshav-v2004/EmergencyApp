@@ -71,11 +71,15 @@ fun WhatsappScreen(
     Scaffold(
 
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate(Screens.AddWhatsappContact.name) }
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null)
+
+            if (allWhatsappContacts.isNullOrEmpty()){
+                FloatingActionButton(
+                    onClick = { navController.navigate(Screens.AddWhatsappContact.name) }
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                }
             }
+
         }
     ){
         Column(

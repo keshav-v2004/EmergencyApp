@@ -315,6 +315,9 @@ fun AddMoreWhatsappContact(
                 unfocusedBorderColor = Color.White,
                 focusedBorderColor = Color.White,
                 disabledBorderColor = Color.White,
+                disabledTextColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
             ),
         )
 
@@ -347,7 +350,10 @@ fun AddMoreWhatsappContact(
                 unfocusedBorderColor = Color.White,
                 focusedBorderColor = Color.White,
                 disabledBorderColor = Color.White,
-                ),
+                disabledTextColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            ),
         )
 
         Spacer(modifier = Modifier.height(45.dp))

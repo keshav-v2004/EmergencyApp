@@ -262,7 +262,7 @@ fun AddMoreSmsContacts(
             onValueChange = {number = it},
             placeholder = {
                 Text(
-                    text = "enter receiver NUMBER",
+                    text = "enter receiver number",
                     color = Color.White,
                     fontWeight = Medium,
                     fontSize = 20.sp,
@@ -291,7 +291,7 @@ fun AddMoreSmsContacts(
             value = name,
             onValueChange = {name = it},
             placeholder = { Text(
-                text = "enter receiver NAME",
+                text = "enter receiver name",
                 color = Color.White,
                 fontWeight = Medium,
                 fontSize = 20.sp,

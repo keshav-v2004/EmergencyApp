@@ -95,7 +95,7 @@ fun MainScreen(
                 allwhatsappContacts,
                 fusedLocationClient
             )
-            BelowLogos()
+            BelowLogos(goToMedScreen = { navController.navigate(Screens.MedInfoScreen.name) })
 
             Spacer(modifier = Modifier.height(35.dp))
             Box(
@@ -367,6 +367,7 @@ fun Logos(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BelowLogos(
+    goToMedScreen : ()->Unit,
     modifier: Modifier = Modifier
 ) {
     val ctx = LocalContext.current
@@ -390,13 +391,19 @@ fun BelowLogos(
                 .weight(1f)
                 .clickable { }
         ) {
-            Box {
+            Box(
+            ) {
                 Text(
                     text = "Medical Information",
                     fontSize = 32.sp,
                     lineHeight = 32.sp,
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+
+                    modifier = Modifier
+                        .clickable {
+                            goToMedScreen()
+                        }
                 )
             }
         }

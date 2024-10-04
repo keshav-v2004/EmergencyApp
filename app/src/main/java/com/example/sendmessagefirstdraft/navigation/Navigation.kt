@@ -10,6 +10,8 @@ import com.example.sendmessagefirstdraft.screens.AddMoreSmsContacts
 import com.example.sendmessagefirstdraft.screens.AddMoreWhatsappContact
 import com.example.sendmessagefirstdraft.screens.MainScreen
 import com.example.sendmessagefirstdraft.screens.MainScreenViewModel
+import com.example.sendmessagefirstdraft.screens.MedInfo
+import com.example.sendmessagefirstdraft.screens.MedInfoViewModel
 import com.example.sendmessagefirstdraft.screens.SmsScreen
 import com.example.sendmessagefirstdraft.screens.SmsScreenViewModel
 import com.example.sendmessagefirstdraft.screens.WhatsappScreen
@@ -21,7 +23,8 @@ enum class Screens {
     SmsScreen,
     WhatsappScreen,
     AddSmsContact,
-    AddWhatsappContact
+    AddWhatsappContact,
+    MedInfoScreen,
 }
 
 @Composable
@@ -29,6 +32,7 @@ fun NavigationRules(
     viewModel: MainScreenViewModel,
     smsScreenViewModel: SmsScreenViewModel,
     whatsappScreenViewModel: WhatsappScreenViewModel,
+    medInfoViewModel: MedInfoViewModel,
     smsManager: SmsManager,
     fusedLocationClient : FusedLocationProviderClient,
     modifier: Modifier = Modifier
@@ -47,6 +51,10 @@ fun NavigationRules(
 
         composable(route = Screens.SmsScreen.name , content = {
             SmsScreen( smsScreenViewModel , navController)
+        })
+
+        composable(route = Screens.MedInfoScreen.name , content = {
+            MedInfo(medInfoViewModel)
         })
 
         composable(route = Screens.AddSmsContact.name , content = {

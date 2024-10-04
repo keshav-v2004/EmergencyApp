@@ -36,6 +36,7 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModelProvider
 import com.example.sendmessagefirstdraft.navigation.NavigationRules
 import com.example.sendmessagefirstdraft.screens.MainScreenViewModel
+import com.example.sendmessagefirstdraft.screens.MedInfoViewModel
 import com.example.sendmessagefirstdraft.screens.SmsScreenViewModel
 import com.example.sendmessagefirstdraft.screens.WhatsappScreenViewModel
 import com.example.sendmessagefirstdraft.ui.theme.SendMessageFirstDraftTheme
@@ -52,6 +53,7 @@ class MainActivity : ComponentActivity() {
 
         val whatsappScreenViewModel = ViewModelProvider(this)[WhatsappScreenViewModel::class.java]
 
+        val medInfoViewModel = ViewModelProvider(this)[MedInfoViewModel::class.java]
         val smsManager  =
             this.getSystemService<SmsManager>(SmsManager::class.java)
                 .createForSubscriptionId(SubscriptionManager.getDefaultSubscriptionId())
@@ -70,6 +72,7 @@ class MainActivity : ComponentActivity() {
                     viewModel ,
                     smsScreenViewModel ,
                     whatsappScreenViewModel ,
+                    medInfoViewModel,
                     smsManager,
                     fusedLocationClient
                 )
